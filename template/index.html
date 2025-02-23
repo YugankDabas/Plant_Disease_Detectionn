@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Plant Disease Detector</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        #preview { width: 250px; height: 250px; object-fit: cover; margin-top: 20px; display: none; }
+    </style>
+</head>
+<body>
+
+    <h2>Plant Disease Detection</h2>
+    <input type="file" id="fileInput">
+    <br><br>
+    <img id="preview">
+    <br><br>
+    <button onclick="predictDisease()">Detect Disease</button>
+    <h3 id="result"></h3>
+
+    <script>
+        let selectedFile;
+
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+            selectedFile = event.target.files[0];
+
+            if (selectedFile) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('preview').src = e.target.result;
+                    document.getElementById('preview').style.display = 'block';
+                };
+                reader.readAsDataURL(selectedFile);
+            }
+        });
+
+        async function predictDisease() {
+            if (!selectedFile) {
+                alert("Please select an image first!");
+                return;
+            }
+
+            let formData = new FormData();
+            formData.append("file", selectedFile);
+
+            let response = await fetch("https://your-app-name.herokuapp.com/predict/", {
+                method: "POST",
+                body: formData
+            });
+
+            let result = await response.json();
+            document.getElementById('result').innerText = "Prediction: " + result.prediction;
+        }
+    </script>
+
+</body>
+</html>
